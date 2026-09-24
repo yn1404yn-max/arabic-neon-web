@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>مولد النيون وشاشات LED العربية — Procedural Arabic Neon & RetroLED</title>
+
+  <!-- Google Fonts: Cairo, Tajawal, Noto Kufi Arabic, Reem Kufi, Amiri -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&family=Tajawal:wght@400;500;700;800&family=Noto+Kufi+Arabic:wght@400;700;800&family=Reem+Kufi:wght@400;700&family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="logo-container">
+      <i class="fa-solid fa-bolt-lightning logo-icon"></i>
+      <h1 class="logo-text">مولد النيون وشاشات LED</h1>
+      <span class="logo-badge">عربي فوري v1.0</span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Mode Toggle: Neon vs RetroLED -->
+      <button class="btn-tool active" id="btn-mode-neon" title="نمط أنابيب النيون الفسفورية">
+        <i class="fa-solid fa-lightbulb"></i> نيون
+      </button>
+      <button class="btn-tool" id="btn-mode-led" title="نمط مصفوفة بكسل LED">
+        <i class="fa-solid fa-braille"></i> رترو LED
+      </button>
+
+      <button class="btn-tool" id="btn-toggle-sidebar" title="فتح لوحة التحكم والإعدادات">
+        <i class="fa-solid fa-sliders"></i> <span>التحكم</span>
+      </button>
+
+      <button class="btn-tool" id="btn-share-link" title="نسخ رابط مباشر للمشروع الحالي">
+        <i class="fa-solid fa-share-nodes"></i> <span>مشاركة</span>
+      </button>
+
+      <button class="btn-tool btn-primary" id="btn-open-export" title="تصدير بصيغ متعددة">
+        <i class="fa-solid fa-download"></i> <span>تصدير</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="workspace-container">
+
+    <!-- Center/Main Canvas Viewport -->
+    <section class="preview-area">
+      <div class="canvas-wrapper" id="canvas-container">
+        <canvas id="neonCanvas"></canvas>
+      </div>
+
+      <!-- Floating Arabic Input Bar & Diacritics -->
+      <div class="floating-input-bar">
+        <div class="input-row">
+          <input type="text" id="inputText" class="arabic-text-field" placeholder="اكتب النص العربي هنا..." value="يوسف نايف" autocomplete="off" />
+          <select id="font-select" class="font-dropdown"></select>
+        </div>
+
+        <!-- Diacritics Bar -->
+        <div class="diacritics-row">
+          <span class="diacritics-label"><i class="fa-solid fa-keyboard"></i> التشكيل:</span>
+          <button class="btn-diacritic" data-char="َ" title="فتحة">َ</button>
+          <button class="btn-diacritic" data-char="ُ" title="ضمة">ُ</button>
+          <button class="btn-diacritic" data-char="ِ" title="كسرة">ِ</button>
+          <button class="btn-diacritic" data-char="ً" title="تنوين فتح">ً</button>
+          <button class="btn-diacritic" data-char="ٌ" title="تنوين ضم">ٌ</button>
+          <button class="btn-diacritic" data-char="ٍ" title="تنوين كسر">ٍ</button>
+          <button class="btn-diacritic" data-char="ّ" title="شدة">ّ</button>
+          <button class="btn-diacritic" data-char="ْ" title="سكون">ْ</button>
+          <button class="btn-diacritic" data-char="ـ" title="تطويل / كشيدة">ـ</button>
+        </div>
+
+        <!-- Quick Export / Share Actions -->
+        <div class="export-actions" style="margin-top: 12px; display: flex; gap: 10px;">
+          <button id="shareBtn" style="flex: 1; padding: 10px 14px; cursor: pointer; border-radius: 8px; background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.15); font-family: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
+            <i class="fa-solid fa-link"></i> مشاركة الرابط 🔗
+          </button>
+          <button id="exportPngBtn" style="flex: 1; padding: 10px 14px; cursor: pointer; background: #7C6FFF; color: #fff; border: none; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 15px rgba(124, 111, 255, 0.4); transition: all 0.2s;">
+            <i class="fa-solid fa-download"></i> تحميل كصورة PNG 📥
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Side Control Panel -->
+    <aside class="control-sidebar" id="control-sidebar">
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="tab-appearance"><i class="fa-solid fa-palette"></i> المظهر</button>
+        <button class="tab-btn" data-tab="tab-animation"><i class="fa-solid fa-film"></i> الحركة</button>
+        <button class="tab-btn" data-tab="tab-presets"><i class="fa-solid fa-wand-magic-sparkles"></i> القوالب</button>
+      </nav>
+
+      <!-- Tab 1: Appearance & Colors -->
+      <div class="tab-content active" id="tab-appearance">
+        <!-- Color Presets -->
+        <div class="control-group">
+          <label class="control-label"><span>لون الإضاءة:</span></label>
+          <div class="color-swatches" id="color-swatches"></div>
+        </div>
+
+        <!-- Custom Color Picker -->
+        <div class="control-group">
+          <label class="control-label"><span>لون مخصص:</span></label>
+          <input type="color" id="glowColor" value="#7C6FFF" style="width: 100%; height: 40px; border-radius: 8px; border: 1px solid var(--border-color); background: #080c16; cursor: pointer;" />
+        </div>
+
+        <!-- Font Size Slider -->
+        <div class="control-group">
+          <div class="control-label">
+            <span>حجم الخط:</span>
+            <span class="control-val" id="val-font-size">52px</span>
+          </div>
+          <input type="range" id="slider-font-size" class="range-slider" min="36" max="150" value="52" />
+        </div>
+
+        <!-- Glow Intensity Slider -->
+        <div class="control-group">
+          <div class="control-label">
+            <span>درجة التوهج (Blur):</span>
+            <span class="control-val" id="val-glow-intensity">15</span>
+          </div>
+          <input type="range" id="blurRange" class="range-slider" min="5" max="30" value="15" />
+        </div>
+
+        <!-- Background Style -->
+        <div class="control-group">
+          <label class="control-label"><span>نمط الخلفية:</span></label>
+          <div class="button-toggle-group" id="bg-style-group">
+            <button class="toggle-option active" data-bg="studio">استوديو</button>
+            <button class="toggle-option" data-bg="brick">جدار طوب</button>
+            <button class="toggle-option" data-bg="grid">شبكة رقمية</button>
+            <button class="toggle-option" data-bg="solid">داكن نقي</button>
+          </div>
+        </div>
+
+        <!-- Custom Background Color -->
+        <div class="control-group">
+          <label class="control-label"><span>لون خلفية المعاينة:</span></label>
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+            <input type="color" id="bgColor" value="#0A0A0F" style="border: none; width: 44px; height: 38px; border-radius: 6px; cursor: pointer; background: transparent;" />
+            <button type="button" id="darkBgPreset" class="toggle-option active" style="padding: 6px 12px; font-size: 13px; cursor: pointer; flex: 1;">داكن</button>
+            <button type="button" id="lightBgPreset" class="toggle-option" style="padding: 6px 12px; font-size: 13px; cursor: pointer; flex: 1;">فاتح</button>
+          </div>
+        </div>
+
+        <!-- Frame Style -->
+        <div class="control-group">
+          <label class="control-label"><span>نمط الإطار المحيط:</span></label>
+          <select id="frameStyleSelect" class="font-dropdown" style="margin-top: 6px;">
+            <option value="none" selected>بدون إطار</option>
+            <option value="box">إطار مستطيل متوهج</option>
+            <option value="corners">زوايا هندسية أنيقة</option>
+          </select>
+        </div>
+
+        <!-- LED Specific Controls (visible when mode is LED) -->
+        <div id="led-specific-controls" style="display: none;">
+          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 16px 0;" />
+          <h4 style="font-size: 13px; color: var(--neon-amber); margin-bottom: 12px;"><i class="fa-solid fa-microchip"></i> خصائص مصفوفة LED</h4>
+
+          <div class="control-group">
+            <label class="control-label"><span>شكل نقطة LED:</span></label>
+            <div class="button-toggle-group" id="led-shape-group">
+              <button class="toggle-option active" data-shape="circle">دائرية</button>
+              <button class="toggle-option" data-shape="square">مربعة</button>
+              <button class="toggle-option" data-shape="rounded">مستديرة</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              <span>حجم نقطة الـ LED:</span>
+              <span class="control-val" id="val-dot-size">5px</span>
+            </div>
+            <input type="range" id="slider-dot-size" class="range-slider" min="2" max="12" value="5" />
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" style="cursor: pointer;">
+              <span>إظهار شبكة النقاط غير المضاءة:</span>
+              <input type="checkbox" id="check-unlit-grid" checked style="accent-color: var(--neon-cyan); width: 18px; height: 18px;" />
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" style="cursor: pointer;">
+              <span>تأثير خطوط المسح (Scanlines):</span>
+              <input type="checkbox" id="check-scanlines" checked style="accent-color: var(--neon-cyan); width: 18px; height: 18px;" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Animations -->
+      <div class="tab-content" id="tab-animation">
+        <div class="control-group">
+          <label class="control-label"><span>نمط الحركة:</span></label>
+          <select id="animationSelect" class="font-dropdown" style="margin-bottom: 10px;">
+            <option value="none">بدون حركة (None)</option>
+            <option value="pulse">نبض (Pulse)</option>
+            <option value="flicker">وميض نيون (Flicker)</option>
+            <option value="scroll">شريط متحرك (Scroll)</option>
+            <option value="typewriter">كتابة تتابعية (Typewriter)</option>
+          </select>
+          <div class="button-toggle-group" id="anim-mode-group" style="flex-direction: column;">
+            <button class="toggle-option active" data-anim="flicker" style="padding: 10px; text-align: right;"><i class="fa-solid fa-bolt"></i> وميض نيون كهربائي (Flicker)</button>
+            <button class="toggle-option" data-anim="pulse" style="padding: 10px; text-align: right;"><i class="fa-solid fa-heart-pulse"></i> نبض وتنفس ضوئي (Pulse)</button>
+            <button class="toggle-option" data-anim="scroll" style="padding: 10px; text-align: right;"><i class="fa-solid fa-arrows-left-right"></i> شريط متحرك (Marquee Scroll)</button>
+            <button class="toggle-option" data-anim="typewriter" style="padding: 10px; text-align: right;"><i class="fa-solid fa-i-cursor"></i> كتابة تتابعية (Typewriter)</button>
+            <button class="toggle-option" data-anim="steady" style="padding: 10px; text-align: right;"><i class="fa-solid fa-sun"></i> إضاءة ثابتة مستقرة (Steady)</button>
+          </div>
+        </div>
+
+        <!-- Animation Speed Slider -->
+        <div class="control-group">
+          <div class="control-label">
+            <span>سرعة الحركة:</span>
+            <span class="control-val" id="val-anim-speed">1.0x</span>
+          </div>
+          <input type="range" id="slider-anim-speed" class="range-slider" min="0.2" max="3.0" step="0.1" value="1.0" />
+        </div>
+
+        <!-- Play / Pause Button -->
+        <div class="control-group">
+          <button class="btn-tool" id="btn-toggle-play" style="width: 100%; justify-content: center;">
+            <i class="fa-solid fa-pause"></i> إيقاف الحركة مؤقتاً
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 3: Presets -->
+      <div class="tab-content" id="tab-presets">
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">اختر قالباً جاهزاً بنقرة واحدة:</p>
+        <div class="presets-grid" id="presets-list"></div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Multi-Format Export Modal -->
+  <div class="modal-backdrop" id="export-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-download"></i> تصدير لوحة النيون فوراً</h3>
+        <button class="btn-close-modal" id="btn-close-export">&times;</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--text-muted);">اختر الصيغة المناسبة لمشروعك:</p>
+
+      <div class="export-grid">
+        <!-- PNG -->
+        <div class="export-option-card" id="export-opt-png">
+          <i class="fa-solid fa-image export-icon"></i>
+          <span class="export-name">صورة عالية الدقة (PNG)</span>
+          <span class="export-desc">صورة مفرغة شفافة أو بالخلفية للطباعة والويب</span>
+        </div>
+
+        <!-- SVG -->
+        <div class="export-option-card" id="export-opt-svg">
+          <i class="fa-solid fa-bezier-curve export-icon"></i>
+          <span class="export-name">متجهات فيكتور (SVG)</span>
+          <span class="export-desc">ملف فيكتور قابل للتكبير مع تأثيرات التوهج</span>
+        </div>
+
+        <!-- CSS Snippet -->
+        <div class="export-option-card" id="export-opt-css">
+          <i class="fa-brands fa-css3-alt export-icon"></i>
+          <span class="export-name">كود ويب (CSS & HTML)</span>
+          <span class="export-desc">كود جاهز للنسخ المباشر في موقعك مع الحركات</span>
+        </div>
+
+        <!-- Video (MP4 / WebM) -->
+        <div class="export-option-card" id="export-opt-video">
+          <i class="fa-solid fa-video export-icon"></i>
+          <span class="export-name">فيديو متحرك (WebM/MP4)</span>
+          <span class="export-desc">تسجيل حركي سلس (60fps) لشبكات التواصل</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Bootstrap Module -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

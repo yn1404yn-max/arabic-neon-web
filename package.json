@@ -1,0 +1,21 @@
+{
+  "name": "arabic-neon-web",
+  "version": "1.0.0",
+  "description": "أداة ويب فورية لتوليد وتحريك لوحات النيون وشاشات LED العربية — Procedural Arabic Neon & RetroLED Web Tool",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "neon",
+    "led",
+    "arabic-typography",
+    "canvas",
+    "web-animations-api",
+    "cyberpunk",
+    "generator"
+  ],
+  "author": "Yousef Nayef (yn1404yn-max)",
+  "license": "MIT"
+}
