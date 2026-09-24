@@ -128,67 +128,11 @@
     button.action-btn:hover { opacity: 0.9; }
     #shareBtn { background: #23283d; color: #fff; }
     #exportPngBtn { background: #7C6FFF; color: #fff; }
-
-    .diacritics-bar {
-      display: flex;
-      gap: 4px;
-      margin-top: 6px;
-      flex-wrap: wrap;
-    }
-    .diacritic-btn {
-      background: #1a1e2d;
-      border: 1px solid #2d344d;
-      color: #7C6FFF;
-      font-size: 1.1rem;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      min-width: 28px;
-      transition: background 0.2s;
-    }
-    .diacritic-btn:hover {
-      background: #2a314d;
-      color: #fff;
-    }
-    .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 900px;
-      margin-bottom: 15px;
-    }
-    .github-link {
-      color: #a0aec0;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #121520;
-      border: 1px solid #23283d;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-    .github-link:hover {
-      color: #fff;
-      border-color: #7C6FFF;
-    }
-    #copyCssBtn { background: #23283d; color: #fff; }
-    #exportSvgBtn { background: #23283d; color: #fff; }
-    #recordVideoBtn { background: #3b2d54; color: #ff79c6; border: 1px solid #6272a4; }
-
   </style>
 </head>
 <body>
 
-  <div class="header-bar">
-    <h1>أداة نصوص النيون واللافتات الاحترافية</h1>
-    <a href="https://github.com/yn1404yn-max/arabic-neon-web" target="_blank" class="github-link">
-      <span>★ مشروع مفتوح المصدر على GitHub</span>
-    </a>
-  </div>
+  <h1>أداة نصوص النيون واللافتات الاحترافية</h1>
 
   <div class="main-container">
     <!-- نافذة المعاينة -->
@@ -201,17 +145,6 @@
       <div class="control-group">
         <label>النص:</label>
         <input type="text" id="inputText" value="يوسف نايف" />
-        <div class="diacritics-bar">
-          <button type="button" class="diacritic-btn" data-char="َ" title="فتحة">َ</button>
-          <button type="button" class="diacritic-btn" data-char="ً" title="تنوين فتح">ً</button>
-          <button type="button" class="diacritic-btn" data-char="ُ" title="ضمة">ُ</button>
-          <button type="button" class="diacritic-btn" data-char="ٌ" title="تنوين ضم">ٌ</button>
-          <button type="button" class="diacritic-btn" data-char="ِ" title="كسرة">ِ</button>
-          <button type="button" class="diacritic-btn" data-char="ٍ" title="تنوين كسر">ٍ</button>
-          <button type="button" class="diacritic-btn" data-char="ّ" title="شدة">ّ</button>
-          <button type="button" class="diacritic-btn" data-char="ْ" title="سكون">ْ</button>
-          <button type="button" class="diacritic-btn" data-char="ـ" title="تطويل/كشيدة">ـ</button>
-        </div>
       </div>
 
       <!-- قائمة الخطوط الـ 40 -->
@@ -411,10 +344,7 @@
       <!-- أزرار الإجراءات -->
       <div class="actions-panel">
         <button id="shareBtn" class="action-btn">مشاركة الرابط 🔗</button>
-        <button id="copyCssBtn" class="action-btn">نسخ كود CSS 📋</button>
-        <button id="exportSvgBtn" class="action-btn">تحميل SVG 📐</button>
-        <button id="recordVideoBtn" class="action-btn">تسجيل WebM 🎥</button>
-        <button id="exportPngBtn" class="action-btn">تحميل PNG 📥</button>
+        <button id="exportPngBtn" class="action-btn">تحميل كصورة PNG 📥</button>
       </div>
     </div>
   </div>
@@ -1150,90 +1080,6 @@
       appState.textMotion = e.target.value;
       applyTextMotion(appState.textMotion);
       saveStateToURL(appState);
-    });
-
-
-    // تشكيل النص العربي
-    document.querySelectorAll(".diacritic-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const char = btn.getAttribute("data-char");
-        const input = document.getElementById("inputText");
-        const start = input.selectionStart || input.value.length;
-        const end = input.selectionEnd || input.value.length;
-        input.value = input.value.substring(0, start) + char + input.value.substring(end);
-        input.focus();
-        input.setSelectionRange(start + char.length, start + char.length);
-        appState.text = input.value;
-        saveStateToURL(appState);
-      });
-    });
-
-    // نسخ كود CSS
-    document.getElementById("copyCssBtn").addEventListener("click", () => {
-      const css = `/* Arabic Neon Glow CSS */\n.neon-text {\n  font-family: '${appState.fontFamily}', sans-serif;\n  color: #FFFFFF;\n  text-shadow:\n    0 0 5px ${appState.glowColor},\n    0 0 10px ${appState.glowColor},\n    0 0 20px ${appState.glowColor},\n    0 0 40px ${appState.glowColor},\n    0 0 80px ${appState.glowColor};\n}`;
-      navigator.clipboard.writeText(css);
-      alert("تم نسخ كود CSS بنجاح!");
-    });
-
-    // تصدير كمتجه SVG
-    document.getElementById("exportSvgBtn").addEventListener("click", () => {
-      const width = canvas.clientWidth * 2;
-      const height = canvas.clientHeight * 2;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <defs>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="${appState.blur}" result="blur1"/>
-      <feGaussianBlur stdDeviation="${appState.blur * 2}" result="blur2"/>
-      <feMerge>
-        <feMergeNode in="blur2"/>
-        <feMergeNode in="blur1"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
-  <rect width="100%" height="100%" fill="${appState.bgColor}"/>
-  <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" font-family="'${appState.fontFamily}', sans-serif" font-size="${appState.fontSize * 2}px" font-weight="bold" fill="#ffffff" stroke="${appState.glowColor}" stroke-width="2" filter="url(#glow)">${appState.text}</text>
-</svg>`;
-      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `neon-sign-${Date.now()}.svg`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-
-    // تسجيل فيديو الرسوم المتحركة WebM
-    document.getElementById("recordVideoBtn").addEventListener("click", () => {
-      const btn = document.getElementById("recordVideoBtn");
-      if (btn.dataset.recording === "true") return;
-      try {
-        const stream = canvas.captureStream(30);
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-        const chunks = [];
-        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'video/webm' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `neon-animation-${Date.now()}.webm`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          btn.textContent = "تسجيل WebM 🎥";
-          btn.dataset.recording = "false";
-        };
-        btn.textContent = "جاري التسجيل... ⏳";
-        btn.dataset.recording = "true";
-        mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 3000);
-      } catch(e) {
-        alert("تسجيل الفيديو غير مدعوم في هذا المتصفح.");
-      }
     });
 
     document.getElementById("shareBtn").addEventListener("click", () => {
