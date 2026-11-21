@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مولّد البرومبت الفوري</title>
+<style>
+  :root{--bg:#07070f;--card:#101022;--line:#26264a;--txt:#eaeaff;--mut:#8b8bb5;--a:#00f0ff;--b:#ff2bd6}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at 20% 0,#14143a,var(--bg) 55%);color:var(--txt);
+    font-family:"Tajawal","Cairo",system-ui,sans-serif;min-height:100vh;padding:24px 16px}
+  .wrap{max-width:860px;margin:auto}
+  h1{text-align:center;margin:8px 0 4px;font-size:2rem;color:var(--a);
+    text-shadow:0 0 8px var(--a),0 0 24px var(--b)}
+  .sub{text-align:center;color:var(--mut);margin-bottom:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;
+    box-shadow:0 0 18px #00f0ff14}
+  textarea{width:100%;min-height:110px;resize:vertical;background:#0a0a18;color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:12px;font:inherit;font-size:1.05rem;outline:none}
+  textarea:focus{border-color:var(--a);box-shadow:0 0 10px #00f0ff55}
+  .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
+  label{color:var(--mut);font-size:.9rem}
+  select{background:#0a0a18;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+  button{cursor:pointer;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:700;color:#05050c;
+    background:linear-gradient(90deg,var(--a),var(--b))}
+  button.ghost{background:transparent;color:var(--a);border:1px solid var(--a)}
+  #out{white-space:pre-wrap;line-height:1.9;min-height:120px;font-size:1rem}
+  .tag{display:inline-block;background:#00f0ff1a;color:var(--a);border:1px solid #00f0ff55;border-radius:99px;
+    padding:2px 12px;font-size:.8rem;margin-inline-start:6px}
+  .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{background:#0a0a18;border:1px solid var(--line);color:var(--mut);padding:5px 12px;border-radius:99px;cursor:pointer;font-size:.85rem}
+  .chip:hover{color:var(--a);border-color:var(--a)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚡ مولّد البرومبت الفوري</h1>
+  <div class="sub">اكتب أي تلميح أو فكرة — ويتولّد البرومبت المنظّم لحظيًا أثناء الكتابة</div>
+
+  <div class="card">
+    <textarea id="in" placeholder="مثال: أبغى موقع لمتجر قهوة&#10;أو: صورة لمدينة مستقبلية بالنيون&#10;أو: لخّص لي مقال عن الذكاء الاصطناعي" autofocus></textarea>
+    <div class="chips" id="chips"></div>
+    <div class="row">
+      <label>النوع</label>
+      <select id="kind">
+        <option value="auto">تلقائي (يكتشفه تلقائيًا)</option>
+        <option value="code">برمجة</option>
+        <option value="write">كتابة محتوى</option>
+        <option value="image">توليد صورة</option>
+        <option value="analyze">تحليل / بحث</option>
+        <option value="translate">ترجمة / تلخيص</option>
+        <option value="learn">شرح / تعلّم</option>
+        <option value="general">عام</option>
+      </select>
+      <label>المستوى</label>
+      <select id="lvl">
+        <option value="full">مفصّل</option>
+        <option value="short">مختصر</option>
+      </select>
+      <label>لغة البرومبت</label>
+      <select id="lang">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="head"><strong>البرومبت الناتج <span class="tag" id="tag">—</span></strong>
+      <span><button id="copy">📋 نسخ</button> <button class="ghost" id="clear">مسح</button></span></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+    <div id="out">سيظهر البرومبت هنا…</div>
+  </div>
+</div>
+
+<script>
+/* ---------- قاعدة القوالب ---------- */
+const KINDS = {
+  code:{ar:'برمجة',kw:['كود','برمج','موقع','تطبيق','سكربت','دالة','api','html','css','python','js','javascript','react','قاعدة بيانات','باج','خطأ','صفحة','بوت','code','app','website'],
+    role:{ar:'مهندس برمجيات محترف بخبرة +10 سنوات',en:'a senior software engineer with 10+ years of experience'},
+    steps:{ar:['حلّل المتطلبات وحدّد الافتراضات قبل الكتابة','اقترح بنية واضحة للملفات/المكونات','اكتب الكود كاملًا وجاهزًا للتشغيل مع تعليقات مختصرة','اذكر طريقة التشغيل والاختبار','نبّه على الحالات الحدّية والأخطاء المحتملة'],
+           en:['Analyze requirements and state assumptions first','Propose a clear structure (files/components)','Write complete, runnable code with brief comments','Explain how to run and test it','Flag edge cases and possible failures']},
+    fmt:{ar:'كتل كود مع عناوين فرعية، ثم ملخص قصير للخطوات التالية',en:'Code blocks under sub-headings, then a short next-steps summary'}},
+  write:{ar:'كتابة محتوى',kw:['اكتب','مقال','منشور','إعلان','وصف','محتوى','نص','رسالة','خطاب','قصة','بوست','تغريدة','سكربت فيديو','تسويق','write','post','article','copy'],
+    role:{ar:'كاتب محتوى ومسوّق إبداعي محترف',en:'a professional creative copywriter and content strategist'},
+    steps:{ar:['حدّد الجمهور المستهدف والنبرة المناسبة','ابدأ بجملة افتتاحية تشدّ الانتباه','قسّم النص إلى فقرات قصيرة ومترابطة','اختم بدعوة واضحة لاتخاذ إجراء','راجع النص لغويًا وأسلوبيًا'],
+           en:['Define target audience and fitting tone','Open with a hook','Use short, connected paragraphs','End with a clear call to action','Proofread for language and style']},
+    fmt:{ar:'النص النهائي جاهزًا للنشر، مع نسختين بديلتين للعنوان',en:'Publish-ready final text plus two alternative headlines'}},
+  image:{ar:'توليد صورة',kw:['صورة','ارسم','رسم','لوحة','شعار','لوجو','تصميم','بوستر','خلفية','مشهد','image','logo','poster','render','illustration'],
+    role:{ar:'مصمّم بصري وفنان مفاهيمي',en:'a visual designer and concept artist'},
+    steps:{ar:['صِف العنصر الرئيسي وموضعه في الكادر','حدّد الأسلوب الفني (واقعي، سينمائي، نيون، كرتوني…)','حدّد الإضاءة والألوان والمزاج العام','حدّد زاوية الكاميرا والتركيب','أضف تفاصيل الجودة: دقة عالية، تفاصيل دقيقة'],
+           en:['Describe the main subject and placement','Specify art style (realistic, cinematic, neon, cartoon…)','Specify lighting, palette, and mood','Specify camera angle and composition','Add quality details: high resolution, fine detail']},
+    fmt:{ar:'وصف واحد متّصل بالإنجليزية جاهز للصق في أداة الصور + نسبة أبعاد مقترحة + Negative prompt',en:'One continuous description ready to paste into an image tool + suggested aspect ratio + negative prompt'}},
+  analyze:{ar:'تحليل / بحث',kw:['حلل','تحليل','قارن','مقارنة','بحث','دراسة','سوق','خطة','استراتيجية','تقرير','أفضل','analyze','compare','research','plan','strategy'],
+    role:{ar:'محلّل استراتيجي وباحث خبير',en:'an expert strategic analyst and researcher'},
+    steps:{ar:['حدّد السؤال الجوهري ومعايير التقييم','اجمع العوامل الرئيسية وصنّفها','قارن البدائل بجدول واضح','استخلص النتائج مع مستوى الثقة','اقترح توصيات قابلة للتنفيذ مرتبة بالأولوية'],
+           en:['Define the core question and evaluation criteria','List and group key factors','Compare options in a clear table','Draw conclusions with confidence levels','Give prioritized, actionable recommendations']},
+    fmt:{ar:'ملخص تنفيذي، ثم جدول مقارنة، ثم التوصيات',en:'Executive summary, comparison table, then recommendations'}},
+  translate:{ar:'ترجمة / تلخيص',kw:['ترجم','ترجمة','لخص','تلخيص','اختصر','أعد صياغة','صياغة','translate','summarize','rewrite','paraphrase'],
+    role:{ar:'مترجم ومحرّر لغوي محترف',en:'a professional translator and editor'},
+    steps:{ar:['افهم المعنى والسياق قبل المعالجة','حافظ على الأفكار الأساسية والنبرة','تجنّب الترجمة الحرفية والحشو','راجع الدقة والسلاسة'],
+           en:['Understand meaning and context first','Preserve core ideas and tone','Avoid literal translation and filler','Check accuracy and fluency']},
+    fmt:{ar:'النص الناتج فقط، ثم ملاحظات قصيرة عند وجود التباس',en:'Output text only, then brief notes if anything was ambiguous'}},
+  learn:{ar:'شرح / تعلّم',kw:['اشرح','شرح','علمني','تعلم','كيف','ما هو','ما هي','لماذا','وضح','مبتدئ','explain','teach','learn','how','why','what is'],
+    role:{ar:'معلّم خبير يبسّط المفاهيم المعقدة',en:'an expert teacher who simplifies complex concepts'},
+    steps:{ar:['ابدأ بتعريف بسيط في جملتين','اشرح بتشبيه من الحياة اليومية','قدّم مثالًا عمليًا خطوة بخطوة','اذكر الأخطاء الشائعة','اختم بتمرين قصير للتطبيق'],
+           en:['Start with a two-sentence definition','Explain via an everyday analogy','Give a step-by-step worked example','Mention common mistakes','End with a short practice exercise']},
+    fmt:{ar:'عناوين واضحة ونقاط قصيرة ومثال عملي',en:'Clear headings, short bullets, and a worked example'}},
+  general:{ar:'عام',kw:[],
+    role:{ar:'مساعد خبير متعدد التخصصات',en:'an expert multidisciplinary assistant'},
+    steps:{ar:['افهم الهدف الحقيقي من الطلب','اطرح افتراضاتك بوضوح إن كانت المعلومات ناقصة','قدّم الإجابة بشكل منظّم ومباشر','اختم بخطوة تالية مقترحة'],
+           en:['Understand the real goal of the request','State assumptions if information is missing','Answer in an organized, direct way','End with a suggested next step']},
+    fmt:{ar:'إجابة منظّمة بعناوين ونقاط مختصرة',en:'Structured answer with headings and concise bullets'}}
+};
+
+const EXAMPLES = ['أبغى موقع لمتجر قهوة','صورة لمدينة مستقبلية بالنيون','لخّص لي مقال عن الذكاء الاصطناعي','قارن بين React و Vue','اشرح البلوكتشين لمبتدئ','اكتب إعلان لمطعم برغر'];
+
+/* ---------- المحرّك ---------- */
+const $ = id => document.getElementById(id);
+function detect(t){
+  const s = t.toLowerCase(); let best='general',score=0;
+  for(const [k,v] of Object.entries(KINDS)){
+    const n = v.kw.reduce((a,w)=>a+(s.includes(w.toLowerCase())?1:0),0);
+    if(n>score){score=n;best=k}
+  }
+  return best;
+}
+function clean(t){
+  return t.trim().replace(/\s+/g,' ')
+    .replace(/^(ابغى|أبغى|ابي|أبي|أبغي|اريد|أريد|ابا|أبا|عايز|ابغا|محتاج|i want|i need|please)\s+/i,'');
+}
+function build(){
+  const raw = $('in').value; const lang = $('lang').value; const lvl = $('lvl').value;
+  if(!raw.trim()){ $('out').textContent='سيظهر البرومبت هنا…'; $('tag').textContent='—'; return ''; }
+  let kind = $('kind').value; if(kind==='auto') kind = detect(raw);
+  const k = KINDS[kind]; const idea = clean(raw); const ar = lang==='ar';
+  $('tag').textContent = k.ar;
+  let p;
+  if(ar){
+    if(lvl==='short'){
+      p = `تصرّف كـ${k.role.ar}.\nالمهمة: ${idea}\nالمطلوب: ${k.fmt.ar}.\nإن كانت المعلومات ناقصة، افترض أفضل الخيارات ووضّحها بإيجاز.`;
+    } else {
+      p = `# الدور\nأنت ${k.role.ar}.\n\n# المهمة\n${idea}\n\n# السياق\n- الطلب الأصلي من المستخدم: «${raw.trim()}»\n- إن كانت هناك معلومات ناقصة، لا تتوقّف؛ افترض أفضل الخيارات المنطقية وصرّح بها في البداية.\n\n# خطوات التنفيذ\n${k.steps.ar.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n# القيود\n- كن دقيقًا ومباشرًا وتجنّب الحشو.\n- استخدم لغة واضحة ومناسبة للجمهور المستهدف.\n- لا تخترع معلومات؛ إن لم تكن متأكدًا فاذكر ذلك.\n\n# صيغة المخرجات\n${k.fmt.ar}.\n\n# قبل التسليم\nراجع إجابتك للتأكد أنها تحقّق المهمة بالكامل ثم اعرضها.`;
+    }
+  } else {
+    const task = idea; // الفكرة تبقى كما كتبها المستخدم
+    if(lvl==='short'){
+      p = `Act as ${k.role.en}.\nTask: ${task}\nOutput: ${k.fmt.en}.\nIf information is missing, assume the best options and state them briefly.`;
+    } else {
+      p = `# Role\nYou are ${k.role.en}.\n\n# Task\n${task}\n\n# Context\n- Original user request: "${raw.trim()}"\n- If information is missing, don't stop: make the most sensible assumptions and state them up front.\n\n# Steps\n${k.steps.en.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n# Constraints\n- Be precise and direct; avoid filler.\n- Use clear language suited to the target audience.\n- Do not fabricate facts; say so when unsure.\n\n# Output format\n${k.fmt.en}.\n\n# Before delivering\nReview your answer to confirm it fully satisfies the task, then present it.`;
+    }
+  }
+  $('out').textContent = p; return p;
+}
+
+/* ---------- ربط الواجهة ---------- */
+['in','kind','lvl','lang'].forEach(id=>$(id).addEventListener('input',build));
+$('copy').onclick = async ()=>{
+  const t = $('out').textContent;
+  try{ await navigator.clipboard.writeText(t); }
+  catch{ const r=document.createRange(); r.selectNodeContents($('out')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand('copy'); }
+  $('copy').textContent='✅ تم النسخ'; setTimeout(()=>$('copy').textContent='📋 نسخ',1400);
+};
+$('clear').onclick = ()=>{ $('in').value=''; build(); $('in').focus(); };
+EXAMPLES.forEach(e=>{
+  const c=document.createElement('span'); c.className='chip'; c.textContent=e;
+  c.onclick=()=>{ $('in').value=e; build(); };
+  $('chips').appendChild(c);
+});
+</script>
+</body>
+</html>
