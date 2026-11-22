@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قالب السيرة الذاتية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1f2326; --muted:#6b6f72; --side:#ecebe6; --accent:#2f4a3e; --line:#d9d9d6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#c9cbc9;font-family:'Cairo','Segoe UI',Tahoma,sans-serif;color:var(--ink);}
+  .toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);
+    padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+  .toolbar button{font-family:inherit;border:0;background:var(--accent);color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer}
+  .toolbar button.alt{background:#e6e6e2;color:var(--ink)}
+  .toolbar span{color:var(--muted)}
+  .page{width:210mm;min-height:297mm;margin:20px auto;background:#fff;display:flex;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);}
+  /* العمود الجانبي (يمين في RTL) */
+  .side{width:34%;background:var(--side);padding:34px 22px;font-size:11px}
+  .main{flex:1;padding:34px 32px}
+  h3.sec{font-size:11px;font-weight:800;letter-spacing:.08em;margin:0 0 14px;color:var(--ink)}
+  .side section{padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+  .side section:last-child{border:0}
+  .contact li{display:flex;align-items:center;gap:10px;margin-bottom:12px;list-style:none;font-size:10.5px}
+  .contact{padding:0;margin:0}
+  .ico{flex:none;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:10px}
+  .edu b{display:block;font-size:11px;margin-bottom:2px}
+  .edu p{margin:0 0 12px;color:var(--muted);font-size:10px;line-height:1.7}
+  .skills{padding:0;margin:0;list-style:none;counter-reset:s}
+  .skills li{counter-increment:s;margin-bottom:8px;color:#444;display:flex;gap:10px}
+  .skills li::before{content:counter(s,decimal-leading-zero);font-weight:700;color:var(--ink);min-width:18px}
+  .lang p{margin:0 0 6px;color:#444;font-size:10.5px}
+  /* الرئيسي */
+  h1{font-size:34px;line-height:1.15;margin:0 0 6px;font-weight:800}
+  .title{color:var(--muted);font-size:12px;letter-spacing:.12em;padding-bottom:18px;border-bottom:1.5px solid #8a8d8f;margin-bottom:26px}
+  .main h3.sec{padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:12px}
+  .main section{margin-bottom:24px}
+  .main p{margin:0;font-size:11px;line-height:1.9;color:#4a4d50}
+  .job h4{margin:0 0 2px;font-size:12px;font-weight:800}
+  .job .meta{color:#8a8d8f;font-size:10px;margin-bottom:6px}
+  .job ul{margin:6px 0 0;padding-inline-start:16px;font-size:11px;line-height:1.9;color:#4a4d50}
+  .job{margin-bottom:18px}
+  [contenteditable]:hover{outline:1px dashed #9bb;outline-offset:2px}
+  [contenteditable]:focus{outline:2px solid var(--accent);outline-offset:2px;background:#f7fbf9}
+  @media print{
+    body{background:#fff}
+    .toolbar{display:none}
+    .page{margin:0;box-shadow:none;width:auto;min-height:100vh}
+    [contenteditable]:hover{outline:0}
+    @page{size:A4;margin:0}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button onclick="window.print()">حفظ كـ PDF / طباعة</button>
+  <button class="alt" onclick="toggleEdit()">تفعيل/إيقاف التعديل</button>
+  <button class="alt" onclick="resetAll()">استرجاع النص الأصلي</button>
+  <span>انقر على أي نص لتعديله. تُحفظ تعديلاتك تلقائيًا في المتصفح.</span>
+</div>
+
+<div class="page" id="cv">
+  <aside class="side">
+    <section>
+      <h3 class="sec">التواصل</h3>
+      <ul class="contact">
+        <li><span class="ico">☎</span><span contenteditable>‎+1 919 555 0147</span></li>
+        <li><span class="ico">✉</span><span contenteditable>g.holloway@email.com</span></li>
+        <li><span class="ico">⌖</span><span contenteditable>دورهام، كارولاينا الشمالية</span></li>
+        <li><span class="ico">◍</span><span contenteditable>www.garrettholloway.com</span></li>
+      </ul>
+    </section>
+
+    <section class="edu">
+      <h3 class="sec">التعليم</h3>
+      <b contenteditable>ماجستير في الاتصال الاستراتيجي</b>
+      <p contenteditable>جامعة إيلون، إيلون، كارولاينا الشمالية<br>2012 – 2014</p>
+      <b contenteditable>بكالوريوس في الصحافة</b>
+      <p contenteditable>جامعة كارولاينا الشمالية في تشابل هيل<br>2008 – 2012</p>
+    </section>
+
+    <section>
+      <h3 class="sec">المهارات</h3>
+      <ul class="skills">
+        <li contenteditable>الاتصال الداخلي</li>
+        <li contenteditable>العلاقات الإعلامية</li>
+        <li contenteditable>اتصال الأزمات</li>
+        <li contenteditable>تطوير العلامة التجارية</li>
+        <li contenteditable>الكتابة والتحرير</li>
+        <li contenteditable>استراتيجية المحتوى</li>
+        <li contenteditable>الرسائل التنفيذية</li>
+        <li contenteditable>اتصال الفعاليات</li>
+        <li contenteditable>القياس والتحليل</li>
+      </ul>
+    </section>
+
+    <section class="lang">
+      <h3 class="sec">اللغات</h3>
+      <p contenteditable>الإنجليزية | لغة أم</p>
+      <p contenteditable>الإسبانية | بإتقان</p>
+      <p contenteditable>البرتغالية | أساسي</p>
+    </section>
+  </aside>
+
+  <main class="main">
+    <h1 contenteditable>غاريت<br>هولواي</h1>
+    <div class="title" contenteditable>مدير الاتصال المؤسسي</div>
+
+    <section>
+      <h3 class="sec">الملف المهني</h3>
+      <p contenteditable>مدير اتصال بخبرة إحدى عشرة سنة في تحويل ما تريد الشركة قوله إلى رسالة يقرؤها الناس فعلًا. أكتب للمسؤولين التنفيذيين، وأجادل الإدارة القانونية، وأحافظ على القصة نفسها سواء ظهرت في بيان صحفي أو اجتماع عام للموظفين أو رسالة بريد إلى عميل.</p>
+    </section>
+
+    <section>
+      <h3 class="sec">الخبرة العملية</h3>
+
+      <div class="job">
+        <h4 contenteditable>مدير الاتصال</h4>
+        <div class="meta" contenteditable>بيدمونت هيلث بارتنرز | دورهام، كارولاينا الشمالية | 2019 – الآن</div>
+        <p contenteditable>أتولى الاتصال الداخلي والخارجي لمنظومة صحية تضم ألفي موظف، من الرسائل التنفيذية إلى الاستجابة الإعلامية.</p>
+        <ul>
+          <li contenteditable>أعدت تصميم الاجتماع العام للموظفين، فارتفع الحضور من 41% إلى 78%</li>
+          <li contenteditable>كتبت دليل إدارة الأزمات الذي استُخدم في انقطاعين للخدمة</li>
+          <li contenteditable>خفّضت زمن الرد على الصحافة من يومين إلى أربع ساعات</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <h4 contenteditable>أخصائي اتصال أول</h4>
+        <div class="meta" contenteditable>مجموعة أردمور | رالي، كارولاينا الشمالية | 2016 – 2019</div>
+        <p contenteditable>أدرت اتصال العلامة التجارية والمنتجات لشركة تأمين إقليمية، بما في ذلك إطلاق ثلاثة منتجات للمستهلكين.</p>
+        <ul>
+          <li contenteditable>قدت إطلاق منتج يضم اليوم 60 ألف عضو</li>
+          <li contenteditable>أدخلت جولة اختبار الرسائل التي أوقفت شعارين تسويقيين غير مناسبين</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <h4 contenteditable>منسق اتصال</h4>
+        <div class="meta" contenteditable>بلو ريدج للإعلام العام | آشفيل، كارولاينا الشمالية | 2014 – 2016</div>
+        <p contenteditable>تولّيت غرفة الأخبار واتصالات العضوية، إضافة إلى النشرة البريدية التي لم يتوقع أحد أن تُقرأ.</p>
+        <ul>
+          <li contenteditable>رفعت معدل فتح النشرة من 18% إلى 34% خلال سنة</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const KEY='cv-ar-v1', root=document.getElementById('cv');
+  const original=root.innerHTML;
+  try{const s=localStorage.getItem(KEY); if(s) root.innerHTML=s;}catch(e){}
+  // ضمان أن كل عنصر قابل للتعديل (بما فيه بنود القوائم)
+  function makeEditable(on){
+    root.querySelectorAll('li,p,h1,h4,.meta,b,.title,span:not(.ico)').forEach(e=>{
+      if(on) e.setAttribute('contenteditable','true'); else e.removeAttribute('contenteditable');
+    });
+  }
+  makeEditable(true);
+  let editing=true;
+  function toggleEdit(){editing=!editing;makeEditable(editing);}
+  function resetAll(){
+    if(!confirm('سيتم استرجاع النص الأصلي وحذف تعديلاتك. متابعة؟'))return;
+    try{localStorage.removeItem(KEY);}catch(e){}
+    root.innerHTML=original; makeEditable(true);
+  }
+  root.addEventListener('input',()=>{try{localStorage.setItem(KEY,root.innerHTML);}catch(e){}});
+</script>
+</body>
+</html>
