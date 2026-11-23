@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خريطة فعاليات الرياض</title>
+<meta name="description" content="خريطة تفاعلية لفعاليات الرياض من نوفمبر 2026 إلى مارس 2027">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0b14; --panel:rgba(14,16,30,.82); --line:rgba(255,255,255,.09);
+  --text:#eef0ff; --muted:#9aa0c3; --accent:#ff2e9a;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal',system-ui,sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--text);overflow:hidden}
+#map{position:absolute;inset:0}
+button{cursor:pointer;color:inherit;background:none;border:0}
+:focus-visible{outline:2px solid #25d9ff;outline-offset:2px}
+
+.panel{position:absolute;top:12px;right:12px;bottom:12px;width:min(400px,calc(100vw - 24px));
+  display:flex;flex-direction:column;gap:10px;z-index:5;pointer-events:none}
+.glass{background:var(--panel);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--line);border-radius:var(--r);pointer-events:auto;
+  box-shadow:0 10px 40px rgba(0,0,0,.45)}
+.head{padding:14px 16px}
+.title{font-size:22px;font-weight:800;letter-spacing:.2px;
+  text-shadow:0 0 12px rgba(255,46,154,.8),0 0 28px rgba(255,46,154,.45);color:#ffe3f3}
+.sub{font-size:13px;color:var(--muted);margin-top:2px}
+.search{margin-top:10px;width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(255,255,255,.05);color:var(--text);font-size:15px}
+.search::placeholder{color:var(--muted)}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 13px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:500;
+  background:rgba(255,255,255,.04);color:var(--muted);transition:.15s;white-space:nowrap}
+.chip[aria-pressed="true"]{color:#fff;border-color:var(--c,#fff);background:color-mix(in srgb,var(--c,#fff) 22%,transparent);
+  box-shadow:0 0 14px color-mix(in srgb,var(--c,#fff) 55%,transparent)}
+.row{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px;font-size:13px;color:var(--muted)}
+.switch{display:flex;gap:8px;align-items:center}
+.switch input{accent-color:var(--accent);width:18px;height:18px}
+
+.list{flex:1;min-height:0;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+.card{display:block;width:100%;text-align:right;padding:12px 14px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.035);transition:.15s;
+  border-right:4px solid var(--c)}
+.card:hover,.card.active{background:rgba(255,255,255,.08);transform:translateX(-2px)}
+.card h3{font-size:15px;font-weight:700}
+.card .meta{font-size:12.5px;color:var(--muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px 10px}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--c) 22%,transparent);color:#fff}
+.tbc{color:#ffcf6b}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+.note{position:absolute;left:12px;bottom:28px;z-index:4;max-width:min(340px,calc(100vw - 440px));
+  padding:9px 12px;font-size:12px;line-height:1.6;color:var(--muted)}
+.note b{color:#ffcf6b}
+
+/* popup */
+.maplibregl-popup-content{background:#12142a!important;color:var(--text);border:1px solid var(--line);
+  border-radius:16px!important;padding:16px!important;min-width:240px;max-width:300px;box-shadow:0 12px 40px rgba(0,0,0,.6);direction:rtl}
+.maplibregl-popup-tip{border-top-color:#12142a!important;border-bottom-color:#12142a!important}
+.maplibregl-popup-close-button{color:#fff;font-size:20px;left:6px;right:auto;padding:4px 8px}
+.pop h3{font-size:17px;margin:6px 0 4px}
+.pop p{font-size:13.5px;color:#cfd3ee;line-height:1.7;margin:6px 0}
+.pop dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13px;margin:8px 0}
+.pop dt{color:var(--muted)}
+.pop .btns{display:flex;gap:8px;margin-top:10px}
+.pop a{flex:1;text-align:center;padding:8px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;color:#fff;background:var(--c)}
+.pop a.alt{background:rgba(255,255,255,.1)}
+
+.maplibregl-ctrl-group{background:var(--panel)!important;border:1px solid var(--line)}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon{filter:invert(1)}
+.maplibregl-ctrl-attrib{background:rgba(10,11,20,.7)!important;color:#aaa!important}
+.maplibregl-ctrl-attrib a{color:#ccc!important}
+
+#sheetBtn{display:none}
+@media (max-width:760px){
+  .panel{top:auto;right:0;left:0;bottom:0;width:100%;height:46vh;padding:0 8px 8px;transition:height .25s}
+  .panel.min{height:178px}
+  .panel.min .list{display:none}
+  .note{display:none}
+  #sheetBtn{display:block;margin:6px auto 0;width:44px;height:5px;border-radius:9px;background:rgba(255,255,255,.35);pointer-events:auto}
+  .title{font-size:18px}
+  .maplibregl-ctrl-top-right{top:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="خريطة فعاليات الرياض"></div>
+
+<aside class="panel" id="panel">
+  <button id="sheetBtn" aria-label="توسيع أو تصغير القائمة"></button>
+  <div class="glass">
+    <div class="head">
+      <div class="title">فعاليات الرياض</div>
+      <div class="sub">نوفمبر 2026 ← مارس 2027 · <span id="count">0</span> فعالية</div>
+      <input id="q" class="search" type="search" placeholder="ابحث: موسم، معرض، كشتة، مكان…" aria-label="بحث">
+    </div>
+    <div class="chips" id="months" role="group" aria-label="الشهر"></div>
+    <div class="chips" id="cats" role="group" aria-label="التصنيف"></div>
+    <div class="row">
+      <label class="switch"><input type="checkbox" id="now"> <span>الجارية اليوم فقط</span></label>
+      <button id="reset" class="chip">إعادة ضبط</button>
+    </div>
+  </div>
+  <div class="glass list" id="list" aria-live="polite"></div>
+</aside>
+
+<div class="glass note"><b>تنبيه:</b> المواعيد والمواقع تقريبية ومجمّعة من مصادر منشورة ومتغيّرة (علامة «غير نهائي»). تأكد من الجهة المنظِّمة أو webook.com قبل الذهاب.</div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="data.js"></script>
+<script>
+"use strict";
+const EVENTS = window.RIYADH_EVENTS, CATS = window.RIYADH_CATS;
+const RANGE_START = new Date("2026-11-01T00:00:00"), RANGE_END = new Date("2027-03-31T23:59:59");
+const MONTHS = [
+  {k:"all", label:"كل الأشهر"},
+  {k:"2026-11", label:"نوفمبر"}, {k:"2026-12", label:"ديسمبر"},
+  {k:"2027-01", label:"يناير"},  {k:"2027-02", label:"فبراير"}, {k:"2027-03", label:"مارس"}
+];
+const fmt = d => new Date(d+"T00:00:00").toLocaleDateString("ar-SA-u-ca-gregory-nu-latn",{day:"numeric",month:"long"});
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dateText = e => e.end===null ? `من ${fmt(e.start)} — حتى إشعار آخر`
+  : e.start===e.end ? fmt(e.start) : `${fmt(e.start)} ← ${fmt(e.end)}`;
+
+const state = {month:"all", cats:new Set(Object.keys(CATS)), q:"", now:false, active:null};
+
+// ---------- فلترة ----------
+function overlapsMonth(e, key){
+  if(key==="all") return e.start<=RANGE_END.toISOString().slice(0,10) && (e.end===null || e.end>="2026-11-01");
+  const [y,m]=key.split("-").map(Number);
+  const ms=new Date(y,m-1,1), me=new Date(y,m,0,23,59,59);
+  const s=new Date(e.start+"T00:00:00"), en=e.end===null?new Date("2099-01-01"):new Date(e.end+"T23:59:59");
+  return s<=me && en>=ms;
+}
+function visible(){
+  const q=state.q.trim(), today=new Date().toISOString().slice(0,10);
+  return EVENTS.filter(e=>
+    state.cats.has(e.cat) && overlapsMonth(e,state.month) &&
+    (!state.now || (e.start<=today && (e.end===null||e.end>=today))) &&
+    (!q || (e.name+e.venue+e.desc+CATS[e.cat].label).includes(q))
+  ).sort((a,b)=>a.start.localeCompare(b.start));
+}
+const toGeo = list => ({type:"FeatureCollection",features:list.map(e=>({
+  type:"Feature",id:e.id,geometry:{type:"Point",coordinates:[e.lng,e.lat]},
+  properties:{id:e.id,name:e.name,cat:e.cat,color:CATS[e.cat].color}}))});
+
+// ---------- الخريطة ----------
+const map = new maplibregl.Map({
+  container:"map",
+  style:"https://tiles.openfreemap.org/styles/dark", // مجاني بلا مفتاح API
+  center:[46.69,24.74], zoom:10.4, pitch:35, bearing:-8, maxZoom:17, attributionControl:{compact:true}
+});
+try{ maplibregl.setRTLTextPlugin("https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.3.0/mapbox-gl-rtl-text.min.js", true); }catch(_){}
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),"top-left");
+map.addControl(new maplibregl.GeolocateControl({trackUserLocation:false}),"top-left");
+
+const colorExpr = ["get","color"];
+map.on("load",()=>{
+  // أسماء عربية للخريطة عند توفرها
+  try{ map.getStyle().layers.forEach(l=>{
+    if(l.type==="symbol" && l.layout && l.layout["text-field"])
+      map.setLayoutProperty(l.id,"text-field",["coalesce",["get","name:ar"],["get","name"]]);
+  }); }catch(_){}
+
+  map.addSource("events",{type:"geojson",data:toGeo(EVENTS),cluster:true,clusterRadius:44,clusterMaxZoom:13});
+  map.addLayer({id:"clusters",type:"circle",source:"events",filter:["has","point_count"],paint:{
+    "circle-color":"#7a5cff","circle-opacity":.9,"circle-radius":["step",["get","point_count"],18,5,24,12,30],
+    "circle-stroke-width":3,"circle-stroke-color":"rgba(122,92,255,.35)"}});
+  map.addLayer({id:"cluster-count",type:"symbol",source:"events",filter:["has","point_count"],
+    layout:{"text-field":["get","point_count_abbreviated"],"text-font":["Noto Sans Bold"],"text-size":14},paint:{"text-color":"#fff"}});
+  map.addLayer({id:"glow",type:"circle",source:"events",filter:["!",["has","point_count"]],paint:{
+    "circle-color":colorExpr,"circle-radius":22,"circle-blur":1,"circle-opacity":.55}});
+  map.addLayer({id:"pts",type:"circle",source:"events",filter:["!",["has","point_count"]],paint:{
+    "circle-color":colorExpr,"circle-radius":["interpolate",["linear"],["zoom"],9,6,15,11],
+    "circle-stroke-width":2.5,"circle-stroke-color":"#fff"}});
+  map.addLayer({id:"labels",type:"symbol",source:"events",minzoom:11.5,filter:["!",["has","point_count"]],
+    layout:{"text-field":["get","name"],"text-font":["Noto Sans Regular"],"text-size":12,"text-offset":[0,1.5],"text-anchor":"top","text-optional":true},
+    paint:{"text-color":"#fff","text-halo-color":"#0a0b14","text-halo-width":1.6}});
+
+  map.on("click","clusters",async e=>{
+    const f=map.queryRenderedFeatures(e.point,{layers:["clusters"]})[0];
+    const z=await map.getSource("events").getClusterExpansionZoom(f.properties.cluster_id);
+    map.easeTo({center:f.geometry.coordinates,zoom:z+.5});
+  });
+  map.on("click","pts",e=>select(e.features[0].properties.id,false));
+  ["clusters","pts"].forEach(l=>{
+    map.on("mouseenter",l,()=>map.getCanvas().style.cursor="pointer");
+    map.on("mouseleave",l,()=>map.getCanvas().style.cursor="");
+  });
+  render();
+});
+
+// ---------- نافذة التفاصيل ----------
+let popup=null;
+function select(id,fly=true){
+  const e=EVENTS.find(x=>x.id==id); if(!e) return;
+  state.active=e.id;
+  const c=CATS[e.cat].color;
+  const dir=`https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}`;
+  const html=`<div class="pop" style="--c:${c}">
+    <span class="tag" style="--c:${c}">${esc(CATS[e.cat].label)}</span>
+    <h3>${esc(e.name)}</h3>
+    <p>${esc(e.desc)}</p>
+    <dl><dt>التاريخ</dt><dd>${esc(dateText(e))}${e.conf==="tbc"?' <span class="tbc">· غير نهائي</span>':""}</dd>
+        <dt>المكان</dt><dd>${esc(e.venue)}${e.approx?' <span class="tbc">· موقع تقريبي</span>':""}</dd>
+        <dt>السعر</dt><dd>${esc(e.price)}</dd></dl>
+    <div class="btns"><a href="${dir}" target="_blank" rel="noopener">الاتجاهات</a>
+    ${e.url?`<a class="alt" href="${esc(e.url)}" target="_blank" rel="noopener">الحجز</a>`:""}</div></div>`;
+  if(popup) popup.remove();
+  popup=new maplibregl.Popup({offset:18,maxWidth:"320px",focusAfterOpen:false}).setLngLat([e.lng,e.lat]).setHTML(html).addTo(map);
+  popup.on("close",()=>{state.active=null;renderList()});
+  if(fly) map.flyTo({center:[e.lng,e.lat],zoom:Math.max(map.getZoom(),13),pitch:50,speed:.9});
+  renderList();
+}
+
+// ---------- الواجهة ----------
+function mkChip(parent,label,pressed,color,onClick){
+  const b=document.createElement("button");
+  b.className="chip";b.textContent=label;b.setAttribute("aria-pressed",pressed);
+  if(color) b.style.setProperty("--c",color); else b.style.setProperty("--c","#ffffff");
+  b.onclick=onClick; parent.appendChild(b); return b;
+}
+function buildChips(){
+  const mEl=document.getElementById("months"); mEl.innerHTML="";
+  MONTHS.forEach(m=>mkChip(mEl,m.label,state.month===m.k,"#25d9ff",()=>{state.month=m.k;buildChips();render();}));
+  const cEl=document.getElementById("cats"); cEl.innerHTML="";
+  Object.entries(CATS).forEach(([k,v])=>mkChip(cEl,v.label,state.cats.has(k),v.color,()=>{
+    state.cats.has(k)?state.cats.delete(k):state.cats.add(k);
+    if(!state.cats.size) state.cats.add(k);
+    buildChips();render();}));
+}
+function renderList(){
+  const list=visible(), el=document.getElementById("list");
+  document.getElementById("count").textContent=list.length;
+  el.innerHTML="";
+  if(!list.length){el.innerHTML='<div class="empty">لا توجد فعاليات مطابقة</div>';return;}
+  list.forEach(e=>{
+    const c=CATS[e.cat].color, b=document.createElement("button");
+    b.className="card"+(state.active===e.id?" active":""); b.style.setProperty("--c",c);
+    b.innerHTML=`<h3>${esc(e.name)}</h3><div class="meta"><span class="tag">${esc(CATS[e.cat].label)}</span>
+      <span>${esc(dateText(e))}</span>${e.conf==="tbc"?'<span class="tbc">غير نهائي</span>':""}</div>
+      <div class="meta"><span>${esc(e.venue)}</span><span>${esc(e.price)}</span></div>`;
+    b.onclick=()=>select(e.id,true); el.appendChild(b);
+  });
+}
+function render(){
+  const list=visible();
+  const src=map.getSource&&map.getSource("events"); if(src) src.setData(toGeo(list));
+  renderList();
+  if(list.length && map.loaded()){
+    const b=new maplibregl.LngLatBounds(); list.forEach(e=>b.extend([e.lng,e.lat]));
+    const mobile=innerWidth<=760;
+    if(!state._fitted || state._dirty) map.fitBounds(b,{padding:mobile?{top:60,bottom:innerHeight*.5,left:30,right:30}:{top:60,bottom:60,left:60,right:440},maxZoom:12,duration:900,pitch:35});
+    state._fitted=true;
+  }
+}
+document.getElementById("q").addEventListener("input",e=>{state.q=e.target.value;state._dirty=true;render();});
+document.getElementById("now").addEventListener("change",e=>{state.now=e.target.checked;state._dirty=true;render();});
+document.getElementById("reset").onclick=()=>{
+  state.month="all";state.cats=new Set(Object.keys(CATS));state.q="";state.now=false;state._dirty=true;
+  document.getElementById("q").value="";document.getElementById("now").checked=false;buildChips();render();};
+document.getElementById("months").addEventListener("click",()=>state._dirty=true);
+document.getElementById("cats").addEventListener("click",()=>state._dirty=true);
+document.getElementById("sheetBtn").onclick=()=>document.getElementById("panel").classList.toggle("min");
+buildChips();renderList();
+</script>
+</body>
+</html>
