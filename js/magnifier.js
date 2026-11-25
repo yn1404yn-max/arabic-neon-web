@@ -14,6 +14,8 @@
   var cx = Math.round(window.innerWidth / 2);   // مركز العدسة في إطار العرض
   var cy = Math.round(window.innerHeight / 2);
   var active = false;
+  var auto = true;                              // حركة تلقائية
+  var tx = cx, ty = cy, vx = 0, vy = 0, t0 = 0, wait = 0;
 
   // ---------- الأنماط ----------
   var style = document.createElement("style");
@@ -57,7 +59,8 @@
     "<div id='mag-handle'><i></i></div>" +
     "<div id='mag-glass'><div id='mag-content'></div></div>" +
     "<div id='mag-ctrl'><button type='button' data-d='-1' aria-label='تصغير'>−</button>" +
-    "<span id='mag-zoom'></span><button type='button' data-d='1' aria-label='تكبير'>+</button></div>";
+    "<span id='mag-zoom'></span><button type='button' data-d='1' aria-label='تكبير'>+</button>"+
+    "<button type='button' id='mag-auto' aria-label='تشغيل/إيقاف الحركة التلقائية'>⏸</button></div>";
 
   // نضيفهما إلى <html> وليس <body> حتى لا تُستنسخ العدسة داخل نفسها
   document.documentElement.appendChild(toggle);
@@ -119,8 +122,31 @@
   }
 
   var raf = 0;
+  function pickTarget() {
+    var m = SIZE / 2;
+    tx = m + Math.random() * (window.innerWidth - SIZE);
+    ty = m + Math.random() * (window.innerHeight - SIZE);
+    wait = 40 + Math.random() * 60;   // توقف قصير عند كل نقطة للقراءة
+  }
+  function stepAuto() {
+    if (!auto || dragging) return;
+    var dx = tx - cx, dy = ty - cy, d = Math.hypot(dx, dy);
+    if (d < 6) {
+      vx *= 0.8; vy *= 0.8;
+      if (--wait <= 0) pickTarget();
+    } else {
+      // تسارع ناعم نحو الهدف مع احتكاك → حركة انسيابية
+      vx = vx * 0.92 + dx / d * 0.35;
+      vy = vy * 0.92 + dy / d * 0.35;
+      var sp = Math.hypot(vx, vy), max = Math.min(7, d * 0.12 + 0.8);
+      if (sp > max) { vx *= max / sp; vy *= max / sp; }
+    }
+    cx += vx; cy += vy;
+    place();
+  }
   function loop() {
     if (!active) return;
+    stepAuto();
     copyCanvases();
     raf = requestAnimationFrame(loop);
   }
@@ -139,7 +165,7 @@
     if (e.target.closest && e.target.closest("#mag-ctrl")) return;
     dragging = true;
     offX = cx - e.clientX; offY = cy - e.clientY;
-    lens.classList.add("drag");
+    lens.classList.add("drag"); vx = vy = 0;
     lens.setPointerCapture(e.pointerId);
     e.preventDefault();
   }
@@ -151,7 +177,7 @@
   }
   function onUp(e) {
     dragging = false;
-    lens.classList.remove("drag");
+    lens.classList.remove("drag"); wait = 90;   // بعد السحب تستأنف الحركة بعد لحظات
     try { lens.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   lens.addEventListener("pointerdown", onDown);
@@ -159,6 +185,11 @@
   lens.addEventListener("pointerup", onUp);
   lens.addEventListener("pointercancel", onUp);
 
+  function setAuto(on) {
+    auto = on;
+    lens.querySelector("#mag-auto").textContent = on ? "⏸" : "▶";
+    if (on) { vx = vy = 0; pickTarget(); }
+  }
   function setZoom(z) {
     zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
     place();
@@ -169,6 +200,7 @@
   }, { passive: false });
   lens.querySelector("#mag-ctrl").addEventListener("click", function (e) {
     var b = e.target.closest("button");
+    if (b && b.id === "mag-auto") { setAuto(!auto); return; }
     if (b) setZoom(zoom + STEP * Number(b.getAttribute("data-d")));
   });
 
@@ -179,6 +211,7 @@
     lens.classList.toggle("on", on);
     if (on) {
       rebuild();
+      setAuto(auto);
       observer.observe(document.body, { subtree: true, childList: true, attributes: true, characterData: true });
       loop();
     } else {
