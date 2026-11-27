@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "min_setup_quality": 2,
+  "min_confidence": 0.8,
+  "escalate_below_confidence": 0.6,
+  "kelly_fraction": 0.25,
+  "reward_risk": 1.5,
+  "stop_bps": 40.0,
+  "max_hold_bars": 30,
+  "cost_bps": 12.0
+}
